@@ -1,7 +1,6 @@
 import pandas as pd
-from mlxtend.frequent_patterns import apriori, association_rules
-
-
+# from mlxtend.frequent_patterns import apriori
+from apyori import apriori
 
 # create sample dataset
 columns = ['ID', 'Beer', 'Diaper', 'Gum', 'Soda', 'Snack']
@@ -14,7 +13,6 @@ dataset = [[1, 1, 1, 1, 1, 0],
            [7, 0, 1, 0, 0, 0],
            [8, 0, 0, 0, 1, 1],
            [9, 0, 0, 0, 1, 1]]
-
 
 
 df = pd.DataFrame(dataset, columns=columns)
@@ -78,11 +76,34 @@ class Apriori:
         apriori_df = apriori(
                     self.df, 
                     min_support=self.threshold,
+                    min_confidence=0.2,
                     use_colnames=use_colnames, 
-                    max_len=max_len,
+                    max_len=max_len
                 )
-        if count:
-            apriori_df['length'] = apriori_df['itemsets'].apply(lambda x: len(x))
+
+        # print(list(apriori_df))
+        association_results = list(apriori_df)
+        # print('=>', len(association_results))
+
+        for item in list(apriori_df):
+            print('Opaa')
+            # first index of the inner list
+            # Contains base item and add item
+            pair = item[0] 
+            items = [x for x in pair]
+            print("Rule: " + items[0] + " -> " + items[1])
+
+            #second index of the inner list
+            print("Support: " + str(item[1]))
+
+            #third index of the list located at 0th
+            #of the third index of the inner list
+
+            print("Confidence: " + str(item[2][0][2]))
+            print("Lift: " + str(item[2][0][3]))
+            print("=====================================")
+        # if count:
+        #     apriori_df['length'] = apriori_df['itemsets'].apply(lambda x: len(x))
 
         return apriori_df
 
@@ -123,7 +144,3 @@ if 'ID' in df.columns: del df['ID'] # ID is not relevant to apriori
 apriori_runner = Apriori(df, threshold=0.4, transform_bol=True)
 apriori_df = apriori_runner.run(use_colnames=True)
 print(apriori_df)
-
-association_rules_result = association_rules(apriori_df, metric='confidence', min_threshold=0, support_only=False)
-print(' ')
-print(association_rules_result)
