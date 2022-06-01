@@ -1,27 +1,31 @@
 import pandas as pd
+import openpyxl
 from mlxtend.frequent_patterns import apriori, association_rules
+import sys
+import numpy as np
 
+# loading dataset
+wookbook = openpyxl.load_workbook("dataset.xlsx")
+worksheet = wookbook.active
 
+columns = []
+dataset = []
 
-# create sample dataset
-columns = ['ID', 'Beer', 'Diaper', 'Gum', 'Soda', 'Snack']
-dataset = [[1, 1, 1, 1, 1, 0],
-           [2, 1, 1, 0, 0, 0],
-           [3, 1, 1, 1, 0, 1],
-           [4, 1, 1, 0, 1, 1],
-           [5, 0, 1, 0, 1, 0],
-           [6, 0, 1, 0, 0, 0],
-           [7, 0, 1, 0, 0, 0],
-           [8, 0, 0, 0, 1, 1],
-           [9, 0, 0, 0, 1, 1]]
-
-
+for i in range(0, worksheet.max_row):
+    row_values = []
+    for col in worksheet.iter_cols(1, worksheet.max_column):
+        if i == 0:
+            columns.append(col[i].value)
+        if i > 0:
+            row_values.append(col[i].value)
+    if i > 0:
+        dataset.append(row_values)
 
 df = pd.DataFrame(dataset, columns=columns)
 
 class Apriori:
     """Apriori Class. Its has Apriori steps."""
-    threshold = 0.5
+    threshold = 0.4
     df = None
 
     def __init__(self, df, threshold=None, transform_bol=False):
@@ -120,10 +124,12 @@ class Apriori:
 
 if 'ID' in df.columns: del df['ID'] # ID is not relevant to apriori 
 
-apriori_runner = Apriori(df, threshold=0.4, transform_bol=True)
+apriori_runner = Apriori(df, threshold=0.1, transform_bol=True)
 apriori_df = apriori_runner.run(use_colnames=True)
 print(apriori_df)
+apriori_df.to_excel('apriori_df.xlsx')
 
-association_rules_result = association_rules(apriori_df, metric='confidence', min_threshold=0, support_only=False)
+association_rules_result = association_rules(apriori_df, metric='confidence', min_threshold=0.1, support_only=False)
 print(' ')
 print(association_rules_result)
+association_rules_result.to_excel('association_rules_result.xlsx')
