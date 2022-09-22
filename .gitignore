@@ -1,3 +1,5 @@
 venv
-apriori_df.xlsx
-association_rules_result.xlsx
+apriori_df_ger_alta.xlsx
+apriori_df_ger_baixa.xlsx
+association_rules_result_ger_alta.xlsx
+association_rules_result_ger_baixa.xlsx
